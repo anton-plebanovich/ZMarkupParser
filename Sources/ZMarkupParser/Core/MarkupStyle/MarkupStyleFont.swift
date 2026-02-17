@@ -116,6 +116,7 @@ public struct MarkupStyleFont: MarkupStyleItem {
         self.italic = self.italic ?? from?.italic
         self.bold = self.bold ?? from?.bold
         self.familyName = self.familyName ?? from?.familyName
+        self.traitCollection = self.traitCollection ?? from?.traitCollection
     }
 
     func isNil() -> Bool {
@@ -123,7 +124,8 @@ public struct MarkupStyleFont: MarkupStyleItem {
                   weight,
                   italic,
                   bold,
-                  familyName] as [Any?]).contains(where: { $0 != nil})
+                  familyName,
+                  traitCollection] as [Any?]).contains(where: { $0 != nil})
     }
 
     func sizeOf(string: String) -> CGSize? {
