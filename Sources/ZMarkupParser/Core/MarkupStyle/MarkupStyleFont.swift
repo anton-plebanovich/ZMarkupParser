@@ -96,13 +96,18 @@ public struct MarkupStyleFont: MarkupStyleItem {
     public var italic: Bool?
     public var bold: Bool?
     public var familyName: FontFamily?
+    
+#if canImport(UIKit)
+    public var traitCollection: UITraitCollection?
+#endif
 
-    public init(size: CGFloat? = nil, weight: FontWeight? = nil, bold: Bool? = nil, italic: Bool? = nil, familyName: FontFamily? = nil) {
+    public init(size: CGFloat? = nil, weight: FontWeight? = nil, bold: Bool? = nil, italic: Bool? = nil, familyName: FontFamily? = nil, traitCollection: UITraitCollection? = nil) {
         self.size = size
         self.weight = weight
         self.bold = bold
         self.italic = italic
         self.familyName = familyName
+        self.traitCollection = traitCollection
     }
 
     mutating func fillIfNil(from: MarkupStyleFont?) {
@@ -134,7 +139,7 @@ public struct MarkupStyleFont: MarkupStyleItem {
 
 extension MarkupStyleFont {
 
-    public init(_ font: UIFont) {
+    public init(_ font: UIFont, traitCollection: UITraitCollection? = nil) {
         self.size = font.pointSize
         self.italic = font.fontDescriptor.symbolicTraits.contains(.traitItalic)
         self.bold = font.fontDescriptor.symbolicTraits.contains(.traitBold)
@@ -142,6 +147,7 @@ extension MarkupStyleFont {
             self.weight = FontWeight.style(fontWeight)
         }
         self.familyName = .familyNames([font.familyName])
+        self.traitCollection = traitCollection
     }
 
     func getFont() -> UIFont? {
@@ -171,7 +177,7 @@ extension MarkupStyleFont {
             traits.insert(.traitItalic)
         }
 
-        return font.with(weight: weight, symbolicTraits: traits)
+        return font.with(weight: weight, symbolicTraits: traits, traitCollection: traitCollection)
     }
 }
 
@@ -235,7 +241,7 @@ private extension UIFont.Weight {
 private extension UIFont {
 
     /// Returns a font object that is the same as the receiver but which has the specified weight and symbolic traits
-    func with(weight: Weight, symbolicTraits: UIFontDescriptor.SymbolicTraits) -> UIFont {
+    func with(weight: Weight, symbolicTraits: UIFontDescriptor.SymbolicTraits, traitCollection: UITraitCollection?) -> UIFont {
 
         var mergedsymbolicTraits = fontDescriptor.symbolicTraits
         mergedsymbolicTraits.formUnion(symbolicTraits)
@@ -249,7 +255,7 @@ private extension UIFont {
         fontAttributes[.traits] = traits
 
         let font = UIFont(descriptor: UIFontDescriptor(fontAttributes: fontAttributes), size: pointSize)
-        return UIFontMetrics.default.scaledFont(for: font)
+        return UIFontMetrics.default.scaledFont(for: font, compatibleWith: traitCollection)
     }
 }
 
